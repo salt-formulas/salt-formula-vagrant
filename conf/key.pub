@@ -1,0 +1,3 @@
+{%- for system in pillar.vagrant.controller.systems %}{%- for server in system.servers %}
+{%- if server.hostname == server_name %}{{ server.public_key }}{%- endif %}
+{%- endfor %}{%- endfor %}

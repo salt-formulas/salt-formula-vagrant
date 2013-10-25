@@ -1,0 +1,134 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+{% set os = salt['grains.item']('os')['os'] %}
+
+{% set kernel = salt['grains.item']('kernel')['kernel'] %}
+
+{%- if kernel == "Linux" %}
+
+{%- for system in pillar.vagrant.controller.systems %}
+{%- if system.name == system_name %}
+
+boxes = {
+  {% for image in pillar.vagrant.controller.images %}
+  '{{ image. name }}' => {
+    'name'  => '{{ image.name }}',
+    'url'   => '{{ image.url }}'
+  },
+  {% endfor %}
+}
+
+Vagrant.configure("2") do |config|
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = false
+  end
+
+  {%- for server in system.servers %}
+  {%- if server.sync_folders is defined %}
+  {%- for folder in server.sync_folders %}
+  config.vm.synced_folder "{{ folder.name }}/", "/{{ folder.name }}"
+  {%- endfor %}
+  {%- endif %}
+  config.vm.define :{{ server.name }} do |{{ server.name }}|
+
+    {{ server.name }}.vm.box = '{{ server.image }}'
+    {{ server.name }}.vm.box_url = boxes['{{ server.image }}']['url']
+    {%- for network in server.networks %}
+    {%- if network.type == 'hostonly' %}
+    {{ server.name }}.vm.network :private_network, ip: "{{ network.address }}"
+    {%- endif %}
+    {%- if network.type == 'bridged' %}
+    {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"
+    {%- endif %}
+    {%- endfor %}
+    {{ server.name }}.vm.hostname = '{{ server.hostname }}'
+
+    {{ server.name }}.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", {{ server.memory }}]
+      vb.customize ["modifyvm", :id, "--cpus", {{ server.cpus }}]
+      vb.name = '{{ system.name }}_{{ server.name }}'
+    end
+
+    {%- if server.master is defined %}
+    {{ server.name }}.vm.provision :salt do |salt|
+      salt.run_highstate = true
+      salt.verbose = true
+      salt.minion_config = "/srv/vagrant/{{ system.name }}/salt/{{ server.name }}/minion.conf"
+      salt.minion_key = "/srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem"
+      salt.minion_pub = "/srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub"
+    end
+    {%- endif %}
+
+  end
+  {% endfor %}
+
+end
+
+{%- endif %}
+{%- endfor %}
+
+{%- endif %}
+
+{%- if os == "Windows" %}
+
+{%- for system in pillar.vagrant.controller.systems %}
+{%- if system.name == system_name %}
+
+boxes = {
+  {% for image in pillar.vagrant.controller.images %}
+  '{{ image. name }}' => {
+    'name'  => '{{ image.name }}',
+    'url'   => '{{ image.url }}'
+  },
+  {% endfor %}
+}
+
+Vagrant.configure("2") do |config|
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+  end
+
+  {%- for server in system.servers %}
+
+  config.vm.define :{{ server.name }} do |{{ server.name }}|
+
+    {{ server.name }}.vm.box = '{{ server.image }}'
+    {{ server.name }}.vm.box_url = boxes['{{ server.image }}']['url']
+    {%- for network in server.networks %}
+    {%- if network.type == 'hostonly' %}
+    {{ server.name }}.vm.network :private_network, ip: "{{ network.address }}"
+    {%- endif %}
+    {%- if network.type == 'bridged' %}
+    {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"
+    {%- endif %}
+    {%- endfor %}
+    {{ server.name }}.vm.hostname = '{{ server.hostname }}'
+
+    {{ server.name }}.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", {{ server.memory }}]
+      vb.customize ["modifyvm", :id, "--cpus", {{ server.cpus }}]
+      vb.name = '{{ system.name }}_{{ server.name }}'
+    end
+
+    {%- if server.master is defined %}
+    {{ server.name }}.vm.provision :salt do |salt|
+      salt.run_highstate = true
+      salt.verbose = true
+      salt.minion_config = "c:\vagrant\{{ system.name }}\salt\{{ server.name }}\minion.conf"
+      salt.minion_key = "c:\vagrant\{{ system.name }}\salt\minion_keys\{{ server.hostname }}.pem"
+      salt.minion_pub = "c:\vagrant\{{ system.name }}\salt\minion_keys\{{ server.hostname }}.pub"
+    end
+    {%- endif %}
+ 
+  end
+  {% endfor %}
+
+end
+
+{%- endif %}
+{%- endfor %}
+
+{%- endif %}
