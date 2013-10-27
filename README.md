@@ -11,7 +11,7 @@ To achieve its magic, Vagrant stands on the shoulders of giants. Machines are pr
       controller:
         enabled: true
         plugins:
-        - vagrant-salt
+        - name: vagrant-salt
         images:
         - name: precise64
           url: http://files.vagrantup.com/precise64.box
