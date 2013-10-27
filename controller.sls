@@ -114,6 +114,8 @@ vagrant_install_image_{{ image.name }}:
 {%- endfor %}
 {%- endif %}
 
+{%- if server.master is defined %}
+
 /srv/vagrant/{{ system.name }}/salt/minion_keys:
   file:
   - directory
@@ -151,6 +153,8 @@ vagrant_install_image_{{ image.name }}:
   - source: salt://minion_keys/{{ server.hostname }}.pem
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
+
+{%- endif %}
 
 {% if server.status == "active" %}
 
