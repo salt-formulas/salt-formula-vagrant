@@ -21,10 +21,10 @@
 {% set vagrant_hash = 'a40522f5fabccb9ddabad03d836e120ff5d14093' %}
 {% endif %}
 
-{% set vagrant_base_url_fragments = [ 'http://files.vagrantup.com/packages/', vagrant_hash %}
+{% set vagrant_base_url_fragments = [ 'http://files.vagrantup.com/packages/', vagrant_hash ] %}
 {% set vagrant_base_url = ""|join(vagrant_base_url_fragments) %}
 
-{% set vagrant_base_file_fragments = [ 'vagrant_', pillar.vagrant.version, '_x86_64.deb' ]
+{% set vagrant_base_file_fragments = [ 'vagrant_', pillar.vagrant.version, '_x86_64.deb' ] %}
 {% set vagrant_base_file = ""|join(vagrant_base_file_fragments) %}
 
 {%- if pillar.vagrant.controller.enabled %}
