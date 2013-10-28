@@ -24,7 +24,7 @@
 {% set vagrant_base_url_fragments = [ 'http://files.vagrantup.com/packages/', vagrant_hash ] %}
 {% set vagrant_base_url = vagrant_base_url_fragments|join('') %}
 
-{% set vagrant_base_file_fragments = [ 'vagrant_', pillar.vagrant.version, '_x86_64.deb' ] %}
+{% set vagrant_base_file_fragments = [ 'vagrant_', vagrant_version, '_x86_64.deb' ] %}
 {% set vagrant_base_file = vagrant_base_file_fragments|join('') %}
 
 {%- if pillar.vagrant.controller.enabled %}
