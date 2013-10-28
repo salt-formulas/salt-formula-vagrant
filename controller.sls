@@ -114,6 +114,7 @@ vagrant_install_image_{{ image.name }}:
 {%- endfor %}
 {%- endif %}
 
+{#
 {%- if server.master is defined %}
 
 /srv/vagrant/{{ system.name }}/salt/minion_keys:
@@ -155,6 +156,7 @@ vagrant_install_image_{{ image.name }}:
     - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
 
 {%- endif %}
+#}
 
 {% if server.status == "active" %}
 
