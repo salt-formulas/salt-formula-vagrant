@@ -114,9 +114,7 @@ vagrant_install_image_{{ image.name }}:
 {%- endfor %}
 {%- endif %}
 
-{#
 {%- if server.master is defined %}
-
 /srv/vagrant/{{ system.name }}/salt/minion_keys:
   file:
   - directory
@@ -154,12 +152,9 @@ vagrant_install_image_{{ image.name }}:
   - source: salt://minion_keys/{{ server.hostname }}.pem
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
-
 {%- endif %}
-#}
 
 {% if server.status == "active" %}
-
 start_vagrant_box_{{ server.hostname }}:
   cmd.run:
   - name: vagrant up {{ server.name }}
@@ -167,7 +162,6 @@ start_vagrant_box_{{ server.hostname }}:
   - cwd: /srv/vagrant/{{ system.name }}
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/{{ server.name }}/minion.conf
-
 {%- endif %}
 
 {%- endfor %}
@@ -176,6 +170,7 @@ start_vagrant_box_{{ server.hostname }}:
 
 {%- endif %}
 
+{#
 {% if os == "Windows" %}
 
 {% set base_dir = "c:" %}
@@ -202,26 +197,12 @@ start_vagrant_box_{{ server.hostname }}:
 
 {% if plugin.name == 'vagrant-salt' %}
 
-vagrant_install_plugin_{{ plugin.name }}:
-  cmd.run:
-  - name: "C:\\HashiCorp\\Vagrant\\bin\\vagrant.bat plugin install {{ plugin.name }}"
-  - cwd: "{{ base_dir }}\\vagrant"
-  - unless: "IF EXIST {{ base_dir }}\\.vagrant.d\\gems\\gems\\vagrant-salt-0.4.0 ]"
-
 {% endif %}
 
 {%- endfor %}
 {%- endif %}
 
 {%- for image in pillar.vagrant.controller.images %}
-
-{#
-vagrant_install_image_{{ image.name }}:
-  cmd.run:
-  - name: "C:\\HashiCorp\\Vagrant\\bin\\vagrant.bat box add {{ image.name }} {{ image.url }}"
-  - cwd: "{{ base_dir }}\\vagrant"
-  - unless: "IF EXIST {{ base_dir }}\\.vagrant.d\\boxes\\{{ image.name }}"
-#}
 
 {%- endfor %}
 
@@ -324,5 +305,6 @@ start_vagrant_box_{{ server.hostname }}:
 {%- endfor %}
 
 {%- endif %}
+#}
 
 {%- endif %}
