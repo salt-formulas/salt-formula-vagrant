@@ -69,6 +69,7 @@ vagrant_install_image_{{ image.name }}:
 {%- endfor %}
 
 {%- for system in pillar.vagrant.controller.systems %}
+
 /srv/vagrant/{{ system.name }}:
   file:
   - directory
@@ -84,15 +85,18 @@ vagrant_install_image_{{ image.name }}:
   - defaults:
     system_name: "{{ system.name }}"
 
+{#
 /srv/vagrant/{{ system.name }}/salt:
   file:
   - directory
   - makedirs: true
   - require:
     - file: /srv/vagrant/{{ system.name }}
+#}
 
 {%- for server in system.servers %}
 
+{#
 {%- if server.sync_folders is defined %}
 {%- for folder in server.sync_folders %}
 /srv/vagrant/{{ system.name }}/{{ folder.name }}:
@@ -103,7 +107,9 @@ vagrant_install_image_{{ image.name }}:
     - file: /srv/vagrant/{{ system.name }}
 {%- endfor %}
 {%- endif %}
+#}
 
+{#
 {%- if server.master is defined %}
 /srv/vagrant/{{ system.name }}/salt/minion_keys:
   file:
@@ -143,16 +149,18 @@ vagrant_install_image_{{ image.name }}:
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
 {%- endif %}
+#}
 
+{#
 {% if server.status == "active" %}
 start_vagrant_box_{{ server.hostname }}:
   cmd.run:
   - name: vagrant up {{ server.name }}
-{#    - unless: "[ -f /root ]" #}
   - cwd: /srv/vagrant/{{ system.name }}
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/{{ server.name }}/minion.conf
 {%- endif %}
+#}
 
 {%- endfor %}
 
