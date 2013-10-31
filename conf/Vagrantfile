@@ -35,6 +35,8 @@ Vagrant.configure("2") do |config|
 
     {{ server.name }}.vm.box = '{{ server.image }}'
     {{ server.name }}.vm.box_url = boxes['{{ server.image }}']['url']
+ 
+    {%- if server.networks is defined %}
     {%- for network in server.networks %}
     {%- if network.type == 'hostonly' %}
     {{ server.name }}.vm.network :private_network, ip: "{{ network.address }}"
@@ -43,6 +45,8 @@ Vagrant.configure("2") do |config|
     {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"
     {%- endif %}
     {%- endfor %}
+    {%- endif %}
+
     {{ server.name }}.vm.hostname = '{{ server.hostname }}'
 
     {{ server.name }}.vm.provider :virtualbox do |vb|
