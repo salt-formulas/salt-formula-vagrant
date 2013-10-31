@@ -131,6 +131,19 @@ vagrant_install_image_{{ image.name }}:
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/{{ server.name }}
 
+{% if pillar.salt.master is defined %}
+cp /srv/salt/minion_keys/{{ server.hostname }}.pub /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub:
+  cmd.run:
+  - unless: "[ -f /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub ]"
+  - require:
+    - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
+
+cp /srv/salt/minion_keys/{{ server.hostname }}.pem /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem:
+  cmd.run:
+  - unless: "[ -f /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem ]"
+  - require:
+    - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
+{% else %}
 /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub:
   file:
   - managed
@@ -144,6 +157,8 @@ vagrant_install_image_{{ image.name }}:
   - source: salt://minion_keys/{{ server.hostname }}.pem
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
+{%- endif %}
+
 {%- endif %}
 
 {% if server.status == "active" %}
