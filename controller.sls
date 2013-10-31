@@ -147,7 +147,7 @@ cp /srv/salt/minion_keys/{{ server.hostname }}.pem /srv/vagrant/{{ system.name }
 chmod 644 /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem:
   cmd.run:
   - require:
-    - file: cp /srv/salt/minion_keys/{{ server.hostname }}.pem /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem
+    - cmd: cp /srv/salt/minion_keys/{{ server.hostname }}.pem /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem
 
 {% else %}
 /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub:
