@@ -143,6 +143,12 @@ cp /srv/salt/minion_keys/{{ server.hostname }}.pem /srv/vagrant/{{ system.name }
   - unless: "[ -f /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem ]"
   - require:
     - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
+
+chmod 644 /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem:
+  cmd.run:
+  - require:
+    - file: cp /srv/salt/minion_keys/{{ server.hostname }}.pem /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem
+
 {% else %}
 /srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub:
   file:
