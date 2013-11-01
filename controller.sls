@@ -53,6 +53,7 @@ vagrant_package:
 
 
 {%- for plugin in pillar.vagrant.controller.plugins %}
+
 {% if plugin.name == 'vagrant-salt' %}
 vagrant_install_plugin_{{ plugin.name }}:
   cmd.run:
@@ -60,6 +61,28 @@ vagrant_install_plugin_{{ plugin.name }}:
   - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-salt-0.4.0
  ]"
 {% endif %}
+
+{% if plugin.name == 'vagrant-windows' %}
+vagrant_plugin_{{ plugin.name }}_packages:
+  pkg.installed:
+  - names:
+    - ruby-rvm
+
+vagrant_plugin_{{ plugin.name }}_rvm_install:
+  cmd.run:
+  - name: rvm install ruby 2.0.0
+  - require:
+    - pkg: vagrant_plugin_{{ plugin.name }}_packages
+
+vagrant_install_plugin_{{ plugin.name }}:
+  cmd.run:
+  - name: "vagrant plugin install {{ plugin.name }}"
+#  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-windows-1.2.3
+ ]"
+  - require:
+    - cmd: vagrant_plugin_{{ plugin.name }}_rvm_install
+{% endif %}
+
 {%- endfor %}
 
 {%- for image in pillar.vagrant.controller.images %}
