@@ -58,11 +58,11 @@ vagrant_package:
 vagrant_install_plugin_{{ plugin.name }}:
   cmd.run:
   - name: "vagrant plugin install {{ plugin.name }}"
-  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-salt-0.4.0
- ]"
+  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-salt-0.4.0 ]"
 {% endif %}
 
-{% if plugin.name == 'vagrant-windows' %}
+{%- if plugin.name == 'vagrant-windows' %}
+
 vagrant_plugin_{{ plugin.name }}_packages:
   pkg.installed:
   - names:
@@ -77,11 +77,11 @@ vagrant_plugin_{{ plugin.name }}_rvm_install:
 vagrant_install_plugin_{{ plugin.name }}:
   cmd.run:
   - name: "vagrant plugin install {{ plugin.name }}"
-#  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-windows-1.2.3
- ]"
+  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-windows-1.2.3 ]"
   - require:
     - cmd: vagrant_plugin_{{ plugin.name }}_rvm_install
-{% endif %}
+
+{%- endif %}
 
 {%- endfor %}
 
