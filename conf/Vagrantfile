@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
     {{ server.name }}.vm.network :private_network, ip: "{{ network.address }}"
     {%- endif %}
     {%- if network.type == 'bridged' %}
-    {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"
+    {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"{% if network.address is defined %}, ip: "{{ network.address }}"{% endif %}
     {%- endif %}
     {%- endfor %}
     {%- endif %}
