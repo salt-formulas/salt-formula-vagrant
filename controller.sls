@@ -51,7 +51,6 @@ vagrant_package:
   - require:
     - pkg: vagrant_package
 
-
 {%- for plugin in pillar.vagrant.controller.plugins %}
 
 {% if plugin.name == 'vagrant-salt' %}
@@ -109,7 +108,7 @@ vagrant_install_image_{{ image.name }}:
   - defaults:
     system_name: "{{ system.name }}"
 
-/srv/vagrant/{{ system.name }}/salt:
+/srv/vagrant/{{ system.name }}/salt/minion_keys:
   file:
   - directory
   - makedirs: true
@@ -130,19 +129,13 @@ vagrant_install_image_{{ image.name }}:
 {%- endif %}
 
 {%- if server.master is defined %}
-/srv/vagrant/{{ system.name }}/salt/minion_keys:
-  file:
-  - directory
-  - makedirs: true
-  - require:
-    - file: /srv/vagrant/{{ system.name }}/salt
 
 /srv/vagrant/{{ system.name }}/salt/{{ server.name }}:
   file:
   - directory
   - makedirs: true
   - require:
-    - file: /srv/vagrant/{{ system.name }}/salt
+    - file: /srv/vagrant/{{ system.name }}/salt/minion_keys
 
 /srv/vagrant/{{ system.name }}/salt/{{ server.name }}/minion.conf:
   file:
