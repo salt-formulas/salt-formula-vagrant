@@ -197,6 +197,31 @@ start_vagrant_box_{{ server.hostname }}:
     - file: /srv/vagrant/{{ system.name }}/salt/{{ server.name }}/minion.conf
 {%- endif %}
 
+{%- set scripts = pillar.get("vagrant",{}).get("controller", {}).get("scripts", false) %}
+
+{%- if scripts == true %}
+
+/srv/vagrant/scripts:
+  file:
+  - directory
+  - makedirs: true
+  - require:
+    - file: /srv/vagrant
+
+/srv/vagrant/scripts/{{ server.name }}.sh:
+  file.managed:
+  - source: salt://vagrant/conf/run.sh
+  - template: jinja
+  - defaults:
+    server_name: {{ server.name }}
+    system_name: {{ system.name }}
+  - user: root
+  - group: root
+  - mode: 770
+  - watch:
+    - file: /srv/vagrant/scripts
+{%- endif %}
+
 {%- endfor %}
 
 {%- endfor %}
