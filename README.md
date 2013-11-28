@@ -15,6 +15,7 @@ To achieve its magic, Vagrant stands on the shoulders of giants. Machines are pr
         images:
         - name: precise64
           url: http://files.vagrantup.com/precise64.box
+        scripts: true
         systems:
         - name: systemname
           servers:
@@ -32,6 +33,11 @@ To achieve its magic, Vagrant stands on the shoulders of giants. Machines are pr
               interface: wlan0
             sync_folders:
             - name: srv
+
+scripts make simple runnable scipt for every server in systems
+```sh
+vagrant up <server> && vagrant ssh <server>
+```
 
 ## Read more
 
