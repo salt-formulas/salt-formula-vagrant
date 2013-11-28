@@ -34,7 +34,7 @@ To achieve its magic, Vagrant stands on the shoulders of giants. Machines are pr
             sync_folders:
             - name: srv
 
-scripts make simple runnable scipt for every server in systems
+scripts make simple runnable script for every server in systems
 `vagrant up <server> && vagrant ssh <server>`
 
 ## Read more
