@@ -42,3 +42,4 @@ scripts make simple runnable script for every server in systems
 * http://www.vagrantup.com/
 * http://docs.vagrantup.com/v2/
 * http://docs.vagrantup.com/v2/synced-folders/
+* http://liquidat.wordpress.com/2014/03/03/howto-vagrant-libvirt-multi-multi-machine-ansible-and-puppet/

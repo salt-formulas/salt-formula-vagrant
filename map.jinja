@@ -1,0 +1,35 @@
+
+{% if pillar.vagrant.controller.version is defined %}
+{% set vagrant_version = pillar.vagrant.controller.version %}
+{% else %}
+{% set vagrant_version = '1.5.2' %}
+{% endif %}
+
+{% set vagrant_base_url = 'https://dl.bintray.com/mitchellh/vagrant' %}
+
+{% set controller = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ['supervisor'],
+        'base_dir': '/srv/vagrant',
+        'base_url': vagrant_base_url,
+        'base_file': 'vagrant_' + vagrant_version + '_x86_64.deb',
+    },
+    'Macos': {
+        'pkgs': ['supervisor'],
+        'base_dir': '/srv/vagrant',
+        'base_url': vagrant_base_url,
+        'base_file': 'vagrant_' + vagrant_version + '.dmg',
+    },
+    'RedHat': {
+        'pkgs': ['supervisor'],
+        'base_dir': '/srv/vagrant',
+        'base_url': vagrant_base_url,
+        'base_file': 'vagrant_' + vagrant_version + '_x86_64.rpm',
+    },
+    'Windows': {
+        'pkgs': ['supervisor'],
+        'base_dir': 'C:/srv/vagrant',
+        'base_url': vagrant_base_url,
+        'base_file': 'vagrant_' + vagrant_version + '.msi',
+    },
+}, merge=salt['pillar.get']('vagrant:controller')) %}
