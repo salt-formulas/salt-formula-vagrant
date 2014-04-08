@@ -136,15 +136,13 @@ chmod 644 {{ controller.base_dir }}/{{ system.name }}/salt/minion_keys/{{ server
 {% else %}
 
 {{ controller.base_dir }}/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub:
-  file:
-  - managed
+  file.managed:
   - source: salt://minion_keys/{{ server.hostname }}.pub
   - require:
     - file: {{ controller.base_dir }}/{{ system.name }}/salt/minion_keys
 
 {{ controller.base_dir }}/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem:
-  file:
-  - managed
+  file.managed:
   - source: salt://minion_keys/{{ server.hostname }}.pem
   - require:
     - file: {{ controller.base_dir }}/{{ system.name }}/salt/minion_keys
