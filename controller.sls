@@ -177,8 +177,6 @@ start_vagrant_box_{{ server.hostname }}:
   - defaults:
     server_name: {{ server.name }}
     system_name: {{ system.name }}
-  - user: root
-  - group: root
   - mode: 770
 
 {%- endif %}
