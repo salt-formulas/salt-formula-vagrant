@@ -5,7 +5,7 @@
 
 {% set kernel = salt['grains.item']('kernel')['kernel'] %}
 
-{%- if kernel == "Linux" %}
+{%- if kernel in ["Linux", "Darwin"] %}
 
 {%- for system in pillar.vagrant.controller.systems %}
 {%- if system.name == system_name %}
