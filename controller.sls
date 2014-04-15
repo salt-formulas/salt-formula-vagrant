@@ -2,7 +2,7 @@
 
 {%- if controller.enabled %}
 
-{% if not grains.os_family in ['Macos'] %}
+{% if not grains.os_family in ['MacOS'] %}
 
 vagrant_download_package:
   cmd.run:
