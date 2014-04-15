@@ -2,24 +2,28 @@
 
 {%- if controller.enabled %}
 
+{% if not grains.os_family in ['Macos'] %}
+
 vagrant_download_package:
   cmd.run:
   - name: wget {{ controller.base_url }}/{{ controller.base_file }}
-  - unless: "[ -f /root/{{ controller.base_file }} ]"
-  - cwd: /root
+  - unless: "[ -f {{ controller.root_dir }}s/{{ controller.base_file }} ]"
+  - cwd: {{ controller.root_dir }}
 
 vagrant_package:
   pkg.installed:
   - sources:
-    - vagrant: /root/{{ controller.base_file }}
+    - vagrant: {{ controller.root_dir }}/{{ controller.base_file }}
   - require:
     - cmd: vagrant_download_package
+  - require_in:
+    - file: {{ controller.base_dir }}
+
+{% endif %}
 
 {{ controller.base_dir }}:
   file.directory:
   - makedirs: true
-  - require:
-    - pkg: vagrant_package
 
 {%- for plugin in controller.plugins %}
 
@@ -28,7 +32,7 @@ vagrant_package:
 vagrant_install_plugin_{{ plugin.name }}:
   cmd.run:
   - name: "vagrant plugin install {{ plugin.name }}"
-  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-salt-0.4.0 ]"
+  - unless: "[ -d {{ controller.root_dir }}/.vagrant.d/gems/gems/vagrant-salt-0.4.0 ]"
 
 {%- endif %}
 
@@ -48,7 +52,7 @@ vagrant_plugin_{{ plugin.name }}_rvm_install:
 vagrant_install_plugin_{{ plugin.name }}:
   cmd.run:
   - name: "vagrant plugin install {{ plugin.name }}"
-  - unless: "[ -d /root/.vagrant.d/gems/gems/vagrant-windows-1.2.3 ]"
+  - unless: "[ -d {{ controller.root_dir }}/.vagrant.d/gems/gems/vagrant-windows-1.2.3 ]"
   - require:
     - cmd: vagrant_plugin_{{ plugin.name }}_rvm_install
 
@@ -60,7 +64,7 @@ vagrant_install_plugin_{{ plugin.name }}:
 vagrant_install_image_{{ image.name }}:
   cmd.run:
   - name: "vagrant box add {{ image.name }} {{ image.url }}"
-  - unless: "[ -d /root/.vagrant.d/boxes/{{ image.name }} ]"
+  - unless: "[ -d {{ controller.root_dir }}/.vagrant.d/boxes/{{ image.name }} ]"
 {%- endfor %}
 
 {%- for system in pillar.vagrant.controller.systems %}

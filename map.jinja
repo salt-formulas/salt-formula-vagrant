@@ -10,16 +10,19 @@
 {% set controller = salt['grains.filter_by']({
     'Debian': {
         'base_dir': '/srv/vagrant',
+        'root_dir': '/root',
         'base_url': vagrant_base_url,
         'base_file': 'vagrant_' + vagrant_version + '_x86_64.deb',
     },
     'Macos': {
         'base_dir': '/srv/vagrant',
+        'root_dir': '/var/root',
         'base_url': vagrant_base_url,
         'base_file': 'vagrant_' + vagrant_version + '.dmg',
     },
     'RedHat': {
         'base_dir': '/srv/vagrant',
+        'root_dir': '/root',
         'base_url': vagrant_base_url,
         'base_file': 'vagrant_' + vagrant_version + '_x86_64.rpm',
     },
