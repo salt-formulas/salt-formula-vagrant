@@ -7,7 +7,7 @@
 vagrant_download_package:
   cmd.run:
   - name: wget {{ controller.base_url }}/{{ controller.base_file }}
-  - unless: "[ -f {{ controller.root_dir }}s/{{ controller.base_file }} ]"
+  - unless: "[ -f {{ controller.root_dir }}/{{ controller.base_file }} ]"
   - cwd: {{ controller.root_dir }}
 
 vagrant_package:
