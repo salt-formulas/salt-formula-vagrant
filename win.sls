@@ -1,5 +1,4 @@
 
-{#
 {% if os == "Windows" %}
 
 {% set base_dir = "c:" %}
@@ -134,4 +133,3 @@ start_vagrant_box_{{ server.hostname }}:
 {%- endfor %}
 
 {%- endif %}
-#}

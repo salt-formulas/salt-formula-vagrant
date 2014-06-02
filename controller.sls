@@ -2,6 +2,13 @@
 
 {%- if controller.enabled %}
 
+{% if  grains.os_family in ['Windows'] %}
+
+include:
+- vagrant.win
+
+{% else %}
+
 {% if not grains.os_family in ['MacOS'] %}
 
 vagrant_download_package:
@@ -184,5 +191,7 @@ start_vagrant_box_{{ server.hostname }}:
 {%- endfor %}
 
 {%- endfor %}
+
+{%- endif %}
 
 {%- endif %}
