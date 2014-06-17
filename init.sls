@@ -1,5 +1,5 @@
 
 include:
-{% if pillar.vagrant.controller is defined %}
-- vagrant.controller
+{% if pillar.vagrant.control is defined %}
+- vagrant.control
 {% endif %}

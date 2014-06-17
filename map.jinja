@@ -1,34 +1,27 @@
-
-{% if pillar.vagrant.controller.version is defined %}
-{% set vagrant_version = pillar.vagrant.controller.version %}
-{% else %}
-{% set vagrant_version = '1.5.2' %}
-{% endif %}
-
-{% set vagrant_base_url = 'https://dl.bintray.com/mitchellh/vagrant' %}
-
-{% set controller = salt['grains.filter_by']({
+{%- set current_version = salt['pillar.get']('vagrant:control:version', '1.6.3') %}
+{%- set base_url = 'https://dl.bintray.com/mitchellh/vagrant' %}
+{%- set control = salt['grains.filter_by']({
     'Debian': {
         'base_dir': '/srv/vagrant',
         'root_dir': '/root',
-        'base_url': vagrant_base_url,
-        'base_file': 'vagrant_' + vagrant_version + '_x86_64.deb',
+        'base_url': base_url,
+        'base_file': 'vagrant_' + current_version + '_x86_64.deb',
     },
     'MacOS': {
         'base_dir': '/srv/vagrant',
         'root_dir': '/var/root',
-        'base_url': vagrant_base_url,
-        'base_file': 'vagrant_' + vagrant_version + '.dmg',
+        'base_url': base_url,
+        'base_file': 'vagrant_' + current_version + '.dmg',
     },
     'RedHat': {
         'base_dir': '/srv/vagrant',
         'root_dir': '/root',
-        'base_url': vagrant_base_url,
-        'base_file': 'vagrant_' + vagrant_version + '_x86_64.rpm',
+        'base_url': base_url,
+        'base_file': 'vagrant_' + current_version + '_x86_64.rpm',
     },
     'Windows': {
         'base_dir': 'C:/srv/vagrant',
-        'base_url': vagrant_base_url,
-        'base_file': 'vagrant_' + vagrant_version + '.msi',
+        'base_url': base_url,
+        'base_file': 'vagrant_' + current_version + '.msi',
     },
-}, merge=salt['pillar.get']('vagrant:controller')) %}
+}, merge=salt['pillar.get']('vagrant:control')) %}

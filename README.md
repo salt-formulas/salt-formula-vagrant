@@ -5,37 +5,57 @@ Vagrant provides easy to configure, reproducible, and portable work environments
 
 To achieve its magic, Vagrant stands on the shoulders of giants. Machines are provisioned on top of VirtualBox, VMware, AWS, or any other provider. Then, industry-standard provisioning tools such as shell scripts, Chef, or Puppet, can be used to automatically install and configure software on the machine.
 
-## Sample pillar:
+## Sample pillars
+
+Vagrant with VirtualBox cluster
 
     vagrant:
-      controller:
+      control:
         enabled: true
-        plugins:
-        - name: vagrant-salt
-        images:
-        - name: precise64
-          url: http://files.vagrantup.com/precise64.box
-        scripts: true
-        systems:
-        - name: systemname
-          servers:
-          - name: box1
-            status: suspended 
-            image: precise64
-            hostname: box1.local.domain.com
-            master: salt-master.domain.com
-            memory: 512
-            cpus: 1
-            networks:
-            - type: hostonly
-              address: 10.10.10.110
-            - type: bridged
-              interface: wlan0
-            sync_folders:
-            - name: srv
+        cluster:
+          clustername:
+            provider: virtualbox
+            domain: local.domain.com
+            control:
+              engine: salt
+              host: salt.domain.com
+            node:
+              box1:
+                status: suspended 
+                image: ubuntu1204
+                memory: 512
+                cpus: 1
+                networks:
+                - type: hostonly
+                  address: 10.10.10.110
 
-scripts make simple runnable script for every server in systems
-`vagrant up <server> && vagrant ssh <server>`
+Vagrant with Windows plugin
+
+    vagrant:
+      control:
+        enabled: true
+        ...
+        plugin:
+          vagrant-windows:
+            version: 1.2.3
+
+Vagrant with presseded images
+
+    vagrant:
+      control:
+        enabled: true
+        ...
+        image:
+          ubuntu1204:
+            source: http://files.vagrantup.com/precise64.box
+
+## Usage commands
+
+Scripts make simple runnable script for every server in systems
+
+    vagrant up <nodename>
+
+    vagrant ssh <nodename>
 
 ## Read more
 
