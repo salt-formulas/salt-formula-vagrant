@@ -5,10 +5,9 @@
 
 vagrant_install_image_{{ name }}:
   cmd.run:
-  - name: "vagrant box add {{ name }} {{ image.address }}"
+  - name: "vagrant box add {{ name }} {{ image.source }}"
   - unless: "[ -d {{ control.root_dir }}/.vagrant.d/boxes/{{ name }} ]"
 
 {%- endfor %}
-
 
 {%- endif %}

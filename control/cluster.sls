@@ -1,7 +1,10 @@
 {%- from "vagrant/map.jinja" import control with context %}
 {%- if control.enabled %}
 
-{%- for cluster_name, cluster in pillar.vagrant.control.cluster.iteritems() %}
+include:
+- vagrant.control.service
+
+{%- for cluster_name, cluster in control.cluster.iteritems() %}
 
 {{ control.base_dir }}/{{ cluster_name }}:
   file.directory:
@@ -16,6 +19,8 @@
   - defaults:
     cluster_name: "{{ cluster_name }}"
 
+{%- if cluster.config.engine == "salt" %}
+
 {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys:
   file.directory:
   - makedirs: true
@@ -23,71 +28,73 @@
     - file: {{ control.base_dir }}/{{ cluster_name }}
 
 {%- for node_name, node in cluster.node.iteritems() %}
+{%- set node_fqdn = node_name+'.'+cluster.domain %}
 
-{%- if server.master is defined %}
-
-{{ control.base_dir }}/{{ name }}/salt/{{ server.name }}:
+{{ control.base_dir }}/{{ cluster_name }}/salt/{{ node_name }}:
   file.directory:
   - makedirs: true
   - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/minion_keys
+    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
 
-{{ control.base_dir }}/{{ name }}/salt/{{ server.name }}/minion.conf:
+{{ control.base_dir }}/{{ cluster_name }}/salt/{{ node_name }}/minion.conf:
   file.managed:
   - source: salt://vagrant/conf/minion.conf
   - template: jinja
   - defaults:
-    server_name: "{{ server.hostname }}"
+    node_name: "{{ node_name }}"
+    cluster_name: "{{ cluster_name }}"
   - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/{{ server.name }}
+    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/{{ node_name }}
 
 {% if pillar.salt is defined %}
 {% if pillar.salt.master is defined %}
 
-cp /srv/salt/minion_keys/{{ server.hostname }}.pub {{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pub:
+cp /srv/salt/minion_keys/{{ node_fqdn }}.pub {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub:
   cmd.run:
-  - unless: "[ -f {{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pub ]"
+  - unless: "[ -f {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub ]"
   - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/minion_keys
+    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
 
-cp /srv/salt/minion_keys/{{ server.hostname }}.pem {{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pem:
+cp /srv/salt/minion_keys/{{ node_fqdn }}.pem {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem:
   cmd.run:
-  - unless: "[ -f {{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pem ]"
+  - unless: "[ -f {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem ]"
   - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/minion_keys
+    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
 
-chmod 644 {{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pem:
+chmod 644 {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem:
   cmd.run:
   - require:
-    - cmd: cp /srv/salt/minion_keys/{{ server.hostname }}.pem {{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pem
+    - cmd: cp /srv/salt/minion_keys/{{ node_fqdn }}.pem {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem
 
 {% else %}
 
-{{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pub:
+{{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub:
   file.managed:
-  - source: salt://minion_keys/{{ server.hostname }}.pub
+  - source: salt://minion_keys/{{ node_fqdn }}.pub
   - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/minion_keys
+    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
 
-{{ control.base_dir }}/{{ name }}/salt/minion_keys/{{ server.hostname }}.pem:
+{{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem:
   file.managed:
-  - source: salt://minion_keys/{{ server.hostname }}.pem
+  - source: salt://minion_keys/{{ node_fqdn }}.pem
   - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/minion_keys
+    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
 
 {%- endif %}
 {%- endif %}
 
+{%- endfor %}
+
 {%- endif %}
 
-{% if server.status == "active" %}
+{%- for node_name, node in cluster.node.iteritems() %}
 
-start_vagrant_box_{{ server.hostname }}:
+{% if node.status == "active" %}
+
+start_vagrant_box_{{ cluster_name }}_{{ node_name }}:
   cmd.run:
-  - name: vagrant up {{ server.name }}
-  - cwd: {{ control.base_dir }}/{{ name }}
-  - require:
-    - file: {{ control.base_dir }}/{{ name }}/salt/{{ server.name }}/minion.conf
+  - name: vagrant up {{ node_name }}
+  - cwd: {{ control.base_dir }}/{{ cluster_name }}
 
 {%- endif %}
 

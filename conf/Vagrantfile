@@ -1,138 +1,74 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+{%- from "vagrant/map.jinja" import control with context %}
 
-{% set os = salt['grains.item']('os')['os'] %}
-
-{% set kernel = salt['grains.item']('kernel')['kernel'] %}
-
-{%- if kernel in ["Linux", "Darwin"] %}
-
-{%- for system in pillar.vagrant.controller.systems %}
-{%- if system.name == system_name %}
+{%- set cluster = salt['pillar.get']('vagrant:cluster:sandbox'+cluster_name) %}
 
 boxes = {
-  {% for image in pillar.vagrant.controller.images %}
-  '{{ image. name }}' => {
-    'name'  => '{{ image.name }}',
-    'url'   => '{{ image.url }}'
+  {%- for name, image in control.image.iteritems() %}
+  '{{ name }}' => {
+    'name'  => '{{ name }}',
+    'url'   => '{{ image.source }}'
   },
-  {% endfor %}
-}
-
-Vagrant.configure("2") do |config|
-
-  config.vm.provider :virtualbox do |vb|
-    vb.gui = false
-  end
-
-  {%- for server in system.servers %}
-  {%- if server.sync_folders is defined %}
-  {%- for folder in server.sync_folders %}
-  config.vm.synced_folder "{{ folder.name }}/", "/{{ folder.name }}"
   {%- endfor %}
-  {%- endif %}
-  config.vm.define :{{ server.name }} do |{{ server.name }}|
-
-    {{ server.name }}.vm.box = '{{ server.image }}'
-    {{ server.name }}.vm.box_url = boxes['{{ server.image }}']['url']
- 
-    {%- if server.networks is defined %}
-    {%- for network in server.networks %}
-    {%- if network.type == 'hostonly' %}
-    {{ server.name }}.vm.network :private_network, ip: "{{ network.address }}"
-    {%- endif %}
-    {%- if network.type == 'bridged' %}
-    {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"{% if network.address is defined %}, ip: "{{ network.address }}"{% endif %}
-    {%- endif %}
-    {%- endfor %}
-    {%- endif %}
-
-    {{ server.name }}.vm.hostname = '{{ server.hostname }}'
-
-    {{ server.name }}.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--memory", {{ server.memory }}]
-      vb.customize ["modifyvm", :id, "--cpus", {{ server.cpus }}]
-      vb.name = '{{ system.name }}_{{ server.name }}'
-    end
-
-    {%- if server.master is defined %}
-    {{ server.name }}.vm.provision :salt do |salt|
-      salt.run_highstate = true
-      salt.verbose = true
-      salt.minion_config = "/srv/vagrant/{{ system.name }}/salt/{{ server.name }}/minion.conf"
-      salt.minion_key = "/srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pem"
-      salt.minion_pub = "/srv/vagrant/{{ system.name }}/salt/minion_keys/{{ server.hostname }}.pub"
-    end
-    {%- endif %}
-
-  end
-  {% endfor %}
-
-end
-
-{%- endif %}
-{%- endfor %}
-
-{%- endif %}
-
-{%- if os == "Windows" %}
-
-{%- for system in pillar.vagrant.controller.systems %}
-{%- if system.name == system_name %}
-
-boxes = {
-  {% for image in pillar.vagrant.controller.images %}
-  '{{ image. name }}' => {
-    'name'  => '{{ image.name }}',
-    'url'   => '{{ image.url }}'
-  },
-  {% endfor %}
 }
 
 Vagrant.configure("2") do |config|
 
-  config.vm.provider :virtualbox do |vb|
-    vb.gui = true
-  end
+  {%- for node_name, node in cluster.node.iteritems() %}
 
-  {%- for server in system.servers %}
+  {%- set node_fqdn = node_name+'.'+cluster.domain %}
 
-  config.vm.define :{{ server.name }} do |{{ server.name }}|
+  config.vm.define :{{ node_name }} do |{{ node_name }}|
 
-    {{ server.name }}.vm.box = '{{ server.image }}'
-    {{ server.name }}.vm.box_url = boxes['{{ server.image }}']['url']
-    {%- for network in server.networks %}
-    {%- if network.type == 'hostonly' %}
-    {{ server.name }}.vm.network :private_network, ip: "{{ network.address }}"
-    {%- endif %}
-    {%- if network.type == 'bridged' %}
-    {{ server.name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"
-    {%- endif %}
-    {%- endfor %}
-    {{ server.name }}.vm.hostname = '{{ server.hostname }}'
-
-    {{ server.name }}.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--memory", {{ server.memory }}]
-      vb.customize ["modifyvm", :id, "--cpus", {{ server.cpus }}]
-      vb.name = '{{ system.name }}_{{ server.name }}'
-    end
-
-    {%- if server.master is defined %}
-    {{ server.name }}.vm.provision :salt do |salt|
-      salt.run_highstate = true
-      salt.verbose = true
-      salt.minion_config = "c:\vagrant\{{ system.name }}\salt\{{ server.name }}\minion.conf"
-      salt.minion_key = "c:\vagrant\{{ system.name }}\salt\minion_keys\{{ server.hostname }}.pem"
-      salt.minion_pub = "c:\vagrant\{{ system.name }}\salt\minion_keys\{{ server.hostname }}.pub"
-    end
-    {%- endif %}
+    {{ node_name }}.vm.box = '{{ node.image }}'
+    {{ node_name }}.vm.box_url = boxes['{{ node.image }}']['url']
  
+    {%- if node.networks is defined %}
+
+    {%- for network in node.networks %}
+
+    {%- if network.type == 'hostonly' %}
+
+    {{ node_name }}.vm.network :private_network, ip: "{{ network.address }}"
+
+    {%- endif %}
+
+    {%- if network.type == 'bridged' %}
+
+    {{ node_name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"{% if network.address is defined %}, ip: "{{ network.address }}"{% endif %}
+
+    {%- endif %}
+
+    {%- endfor %}
+
+    {%- endif %}
+
+    {{ node_name }}.vm.hostname = '{{ node_fqdn }}'
+
+    {{ node_name }}.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", {{ node.memory }}]
+      vb.customize ["modifyvm", :id, "--cpus", {{ node.cpus }}]
+      vb.name = '{{ cluster_name }}_{{ node_name }}'
+      {%- if node.get('gui', False) %}
+      vb.gui = false
+      {%- else %}
+      vb.gui = true
+      {%- endif %}
+    end
+
+    {%- if cluster.config.engine == "salt" %}
+
+    {{ node_name }}.vm.provision :salt do |salt|
+      salt.run_highstate = true
+      salt.minion_config = "/srv/vagrant/{{ cluster_name }}/salt/{{ node_name }}/minion.conf"
+      salt.minion_key = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node.fqdn }}.pem"
+      salt.minion_pub = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node.fqdn }}.pub"
+  
+    end
+    {%- endif %}
+  
   end
-  {% endfor %}
+  {%- endfor %}
 
 end
-
-{%- endif %}
-{%- endfor %}
-
-{%- endif %}
