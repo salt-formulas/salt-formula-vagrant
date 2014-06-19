@@ -14,7 +14,7 @@ include:
 
 {{ control.base_dir }}/{{ cluster_name }}/Vagrantfile:
   file.managed:
-  - source: salt://vagrant/conf/Vagrantfile
+  - source: salt://vagrant/files/Vagrantfile
   - template: jinja
   - defaults:
     cluster_name: "{{ cluster_name }}"
@@ -38,7 +38,7 @@ include:
 
 {{ control.base_dir }}/{{ cluster_name }}/salt/{{ node_name }}/minion.conf:
   file.managed:
-  - source: salt://vagrant/conf/minion.conf
+  - source: salt://vagrant/files/minion.conf
   - template: jinja
   - defaults:
     node_name: "{{ node_name }}"
@@ -89,7 +89,7 @@ chmod 644 {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqd
 
 {%- for node_name, node in cluster.node.iteritems() %}
 
-{% if node.status == "active" %}
+{% if node.get('status', 'suspended') == "active" %}
 
 start_vagrant_box_{{ cluster_name }}_{{ node_name }}:
   cmd.run:
