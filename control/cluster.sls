@@ -46,42 +46,19 @@ include:
   - require:
     - file: {{ control.base_dir }}/{{ cluster_name }}/salt/{{ node_name }}
 
-{% if pillar.salt is defined %}
-{% if pillar.salt.master is defined %}
-
-cp /srv/salt/minion_keys/{{ node_fqdn }}.pub {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub:
-  cmd.run:
-  - unless: "[ -f {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub ]"
-  - require:
-    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
-
-cp /srv/salt/minion_keys/{{ node_fqdn }}.pem {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem:
-  cmd.run:
-  - unless: "[ -f {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem ]"
-  - require:
-    - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
-
-chmod 644 {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem:
-  cmd.run:
-  - require:
-    - cmd: cp /srv/salt/minion_keys/{{ node_fqdn }}.pem {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem
-
-{% else %}
-
 {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub:
   file.managed:
   - source: salt://minion_keys/{{ node_fqdn }}.pub
+  - mode: 644
   - require:
     - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
 
 {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem:
   file.managed:
   - source: salt://minion_keys/{{ node_fqdn }}.pem
+  - mode: 644
   - require:
     - file: {{ control.base_dir }}/{{ cluster_name }}/salt/minion_keys
-
-{%- endif %}
-{%- endif %}
 
 {%- endfor %}
 
