@@ -1,16 +1,10 @@
 #!/bin/sh
 
-{%- for system in pillar.vagrant.controller.systems  %}
-{%- if system.name == system_name %}
-{%- for server in system.servers  %}
-{%- if server.name == server_name %}
-
-cd /srv/vagrant/{{ system.name }}
-vagrant up {{ server.name }}
-vagrant ssh {{ server.name }}
-
+cd /srv/vagrant/{{ cluster_name }}
+vagrant up {{ node_name }}
+{%- if not mount_dir == "" %}
+set -e
+su {{ user_name }} -c 'sshfs root@{{ node_fqdn }}:/srv {{ mount_dir }}'
+su {{ user_name }} -c 'subl {{ mount_dir }}'
 {%- endif %}
-{%- endfor %}
-
-{%- endif %}
-{%- endfor %}
+vagrant ssh {{ node_name }}
