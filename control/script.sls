@@ -1,6 +1,7 @@
 {%- from "vagrant/map.jinja" import control with context %}
+{%- if control.enabled %}
 
-{%- if control.script.enabled %}
+{%- if control.script is defined %}
 
 include:
 - vagrant.control.cluster
@@ -41,5 +42,7 @@ include:
 {%- endfor %}
 
 {%- endfor %}
+
+{%- endif %}
 
 {%- endif %}
