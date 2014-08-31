@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
 
     {{ node_name|replace('-', '_') }}.vm.provision :salt do |salt|
       salt.run_highstate = true
-{#      salt.verbose = true #}
+      salt.verbose = true
       salt.minion_config = "/srv/vagrant/{{ cluster_name }}/salt/{{ node_name }}/minion.conf"
       salt.minion_key = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem"
       salt.minion_pub = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub"
