@@ -1,15 +1,6 @@
 {%- from "vagrant/map.jinja" import control with context %}
 {%- if control.enabled %}
 
-{%- if grains.os_family == 'Windows' %}
-
-include:
-- vagrant.win
-
-{%- else %}
-
-{%- if not grains.os_family in ['MacOS'] %}
-
 vagrant_download_package:
   cmd.run:
   - name: wget {{ control.base_url }}/{{ control.base_file }}
@@ -25,12 +16,8 @@ vagrant_package:
   - require_in:
     - file: {{ control.base_dir }}
 
-{%- endif %}
-
 {{ control.base_dir }}:
   file.directory:
   - makedirs: true
-
-{%- endif %}
 
 {%- endif %}
