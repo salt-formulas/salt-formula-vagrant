@@ -17,24 +17,25 @@ Vagrant.configure("2") do |config|
 
   {%- for node_name, node in cluster.node.iteritems() %}
   {%- set node_fqdn = node_name+'.'+cluster.domain %}
+  {%- set node_underscore_name = node_name|replace('-', '_')|replace('.', '_') %}
 
-  config.vm.define :{{ node_name|replace('-', '_')|replace('.', '_') }} do |{{ node_name|replace('-', '_')|replace('.', '_') }}|
+  config.vm.define :{{ node_underscore_name }} do |{{ node_underscore_name }}|
 
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.hostname = '{{ node_fqdn }}'
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.box = '{{ node.image }}'
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.box_url = boxes['{{ node.image }}']['url']
+    {{ node_underscore_name }}.vm.hostname = '{{ node_fqdn }}'
+    {{ node_underscore_name }}.vm.box = '{{ node.image }}'
+    {{ node_underscore_name }}.vm.box_url = boxes['{{ node.image }}']['url']
     {%- if node.networks is defined %}
     {%- for network in node.networks %}
     {%- if network.type == 'hostonly' %}
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.network :private_network, ip: "{{ network.address }}"
+    {{ node_underscore_name }}.vm.network :private_network, ip: "{{ network.address }}"
     {%- endif %}
     {%- if network.type == 'bridged' %}
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.network :public_network, :bridge => "{{ network.bridge }}"{% if network.address is defined %}, ip: "{{ network.address }}"{% endif %}
+    {{ node_underscore_name }}.vm.network :public_network, :bridge => "{{ network.bridge }}"{% if network.address is defined %}, ip: "{{ network.address }}"{% endif %}
     {%- endif %}
     {%- endfor %}
     {%- endif %}
 
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.provider :virtualbox do |vb|
+    {{ node_underscore_name }}.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--memory", {{ node.memory }}]
       vb.customize ["modifyvm", :id, "--cpus", {{ node.cpus }}]
       vb.name = '{{ cluster_name }}_{{ node_name }}'
@@ -47,7 +48,7 @@ Vagrant.configure("2") do |config|
 
     {%- if cluster.config.engine == "salt" %}
 
-    {{ node_name|replace('-', '_')|replace('.', '_') }}.vm.provision :salt do |salt|
+    {{ node_underscore_name }}.vm.provision :salt do |salt|
       salt.minion_config = "/srv/vagrant/{{ cluster_name }}/salt/{{ node_name }}/minion.conf"
       salt.minion_key = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem"
       salt.minion_pub = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub"

@@ -1,12 +1,11 @@
-{%- set current_version = salt['pillar.get']('vagrant:control:version', '1.7.4') %}
-{%- set base_url = 'https://dl.bintray.com/mitchellh/vagrant' %}
+{%- set current_version = salt['pillar.get']('vagrant:control:version', '1.8.4') %}
+{%- set base_url = 'https://releases.hashicorp.com/vagrant/' + current_version %}
 {%- set control = salt['grains.filter_by']({
   'Debian': {
     'base_dir': '/srv/vagrant',
     'root_dir': '/root',
     'base_url': base_url,
     'base_file': 'vagrant_' + current_version + '_x86_64.deb',
-    'download_hash': 'sha256=dcd2c2b5d7ae2183d82b8b363979901474ba8d2006410576ada89d7fa7668336',
     'image': {},
     'plugin': {},
     'cluster': {},
@@ -16,7 +15,6 @@
     'root_dir': '/var/root',
     'base_url': base_url,
     'base_file': 'vagrant_' + current_version + '.dmg',
-    'download_hash': 'sha256=3d2e680cc206ac1d480726052e42e193eabce56ed65fc79b91bc85e4c7d2deb8',
     'image': {},
     'plugin': {},
     'cluster': {},
@@ -26,7 +24,6 @@
     'root_dir': '/root',
     'base_url': base_url,
     'base_file': 'vagrant_' + current_version + '_x86_64.rpm',
-    'download_hash': 'sha256=b0a09f6e6f9fc17b01373ff54d1f5b0dc844394886109ef407a5f1bcfdd4e304',
     'image': {},
     'plugin': {},
     'cluster': {},
@@ -35,7 +32,6 @@
     'base_dir': 'C:/srv/vagrant',
     'base_url': base_url,
     'base_file': 'vagrant_' + current_version + '.msi',
-    'download_hash': 'sha256=a1ca7d99f162e001c826452a724341f421adfaef3e1366ee504b73ad19e3574f',
     'image': {},
     'plugin': {},
     'cluster': {},
