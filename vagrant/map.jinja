@@ -1,4 +1,4 @@
-{%- set current_version = salt['pillar.get']('vagrant:control:version', '1.8.4') %}
+{%- set current_version = salt['pillar.get']('vagrant:control:version', '1.8.7') %}
 {%- set base_url = 'https://releases.hashicorp.com/vagrant/' + current_version %}
 {%- set control = salt['grains.filter_by']({
   'Debian': {

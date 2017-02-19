@@ -1,11 +1,18 @@
 
-=======
-Vagrant 
-=======
+===============
+Vagrant formula
+===============
 
-Vagrant provides easy to configure, reproducible, and portable work environments built on top of industry-standard technology and controlled by a single consistent workflow to help maximize the productivity and flexibility of you and your team.
+Vagrant provides easy to configure, reproducible, and portable work
+environments built on top of industry-standard technology and controlled by a
+single consistent workflow to help maximize the productivity and flexibility
+of you and your team.
 
-To achieve its magic, Vagrant stands on the shoulders of giants. Machines are provisioned on top of VirtualBox, VMware, AWS, or any other provider. Then, industry-standard provisioning tools such as shell scripts, Chef, or Puppet, can be used to automatically install and configure software on the machine.
+To achieve its magic, Vagrant stands on the shoulders of giants. Machines are
+provisioned on top of VirtualBox, VMware, AWS, or any other provider. Then,
+industry-standard provisioning tools such as shell scripts, Chef, or Puppet,
+can be used to automatically install and configure software on the machine.
+
 
 Sample pillars
 ==============
@@ -26,7 +33,7 @@ Vagrant with VirtualBox cluster
               host: salt.domain.com
             node:
               box1:
-                status: suspended 
+                status: suspended
                 image: ubuntu1204
                 memory: 512
                 cpus: 1
@@ -56,24 +63,26 @@ Vagrant with presseded images
           ubuntu1204:
             source: http://files.vagrantup.com/precise64.box
 
-Usage
-=====
 
-Scripts make simple runnable script for every server in systems
+Sample usage
+============
+
+Start and connect machine
 
 .. code-block:: bash
 
-    vagrant up <nodename>
+    cd /srv/vagrant/<cluster_name>
+    vagrant up <node_name>
+    vagrant ssh <node_name>
 
-    vagrant ssh <nodename>
 
-Read more
-=========
+External links
+==============
 
 * http://www.vagrantup.com/
 * http://docs.vagrantup.com/v2/
 * http://docs.vagrantup.com/v2/synced-folders/
-* http://liquidat.wordpress.com/2014/03/03/howto-vagrant-libvirt-multi-multi-machine-ansible-and-puppet/
+
 
 Documentation and Bugs
 ======================

@@ -23,7 +23,9 @@ Vagrant.configure("2") do |config|
 
     {{ node_underscore_name }}.vm.hostname = '{{ node_fqdn }}'
     {{ node_underscore_name }}.vm.box = '{{ node.image }}'
+    {#
     {{ node_underscore_name }}.vm.box_url = boxes['{{ node.image }}']['url']
+    #}
     {%- if node.networks is defined %}
     {%- for network in node.networks %}
     {%- if network.type == 'hostonly' %}
@@ -36,8 +38,8 @@ Vagrant.configure("2") do |config|
     {%- endif %}
 
     {{ node_underscore_name }}.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--memory", {{ node.memory }}]
-      vb.customize ["modifyvm", :id, "--cpus", {{ node.cpus }}]
+      vb.customize ["modifyvm", :id, "--memory", "{{ node.memory }}"]
+      vb.customize ["modifyvm", :id, "--cpus", "{{ node.cpus }}"]
       vb.name = '{{ cluster_name }}_{{ node_name }}'
       {%- if node.get('gui', False) %}
       vb.gui = true
@@ -49,10 +51,9 @@ Vagrant.configure("2") do |config|
     {%- if cluster.config.engine == "salt" %}
 
     {{ node_underscore_name }}.vm.provision :salt do |salt|
-      salt.minion_config = "/srv/vagrant/{{ cluster_name }}/salt/{{ node_name }}/minion.conf"
-      salt.minion_key = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pem"
-      salt.minion_pub = "/srv/vagrant/{{ cluster_name }}/salt/minion_keys/{{ node_fqdn }}.pub"
-      salt.colorize = true
+      salt.minion_config = "salt/{{ node_name }}/minion.conf"
+      salt.minion_key = "salt/minion_keys/{{ node_fqdn }}.pem"
+      salt.minion_pub = "salt/minion_keys/{{ node_fqdn }}.pub"
       salt.bootstrap_options = "-F -c /tmp -P"
     end
 
