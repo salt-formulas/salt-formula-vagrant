@@ -31,6 +31,7 @@ Vagrant with VirtualBox cluster
             control:
               engine: salt
               host: salt.domain.com
+              version: '2016.3'
             node:
               box1:
                 status: suspended
@@ -76,8 +77,8 @@ Start and connect machine
     vagrant ssh <node_name>
 
 
-External links
-==============
+More information
+================
 
 * http://www.vagrantup.com/
 * http://docs.vagrantup.com/v2/

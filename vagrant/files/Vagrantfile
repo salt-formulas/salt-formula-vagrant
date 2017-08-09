@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
       salt.minion_config = "salt/{{ node_name }}/minion.conf"
       salt.minion_key = "salt/minion_keys/{{ node_fqdn }}.pem"
       salt.minion_pub = "salt/minion_keys/{{ node_fqdn }}.pub"
-      salt.bootstrap_options = "-F -c /tmp -P"
+      salt.bootstrap_options = "-F -c /tmp -P {% if cluster.config.version is defined %}{{ cluster.config.version }}{% endif %}"
     end
 
     {%- endif %}
